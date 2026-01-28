@@ -42,8 +42,7 @@ const App = () => {
     
     <div>
       <h1>Anecdote of the day</h1>
-      {anecdotes[selected]}
-      <br/>
+      <p>{anecdotes[selected]} has {votes[getLargest()]} votes </p>
       <button onClick={() =>  setSelected(selection = Getrand(8))}> next anecdote </button>
       <button onClick={() => handleVotes() }>vote</button>
       <h1>Anecdote with most votes</h1>
