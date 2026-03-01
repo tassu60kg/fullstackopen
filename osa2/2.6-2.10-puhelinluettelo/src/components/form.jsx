@@ -1,3 +1,5 @@
+import axiosService from '../services/axios'
+
 const Form = ({persons, setPersons, newName, newNumber, setNewName, setNewNumber}) => {
 
     const handleNameInput = (event) => {
@@ -6,17 +8,29 @@ const Form = ({persons, setPersons, newName, newNumber, setNewName, setNewNumber
 const handleNumberInput = (event) => {
     setNewNumber(event.target.value)
   }
-    const addPerson = (event) => {
+  const addPerson = (event) => {
     event.preventDefault()
-    if (!persons.find((person) => person.name === newName) ) { 
     const personObject ={
       name: newName,
-      number: newNumber}
-      console.log(personObject)
-    setPersons(persons.concat(personObject))
-    setNewName('')
-    setNewNumber('')}
-    else {alert(`${newName} is already added to the phonebook `)}
+      number: newNumber
+    }
+    const duplicate = (persons.find((person) => person.name === newName))
+    console.log(duplicate)
+    if (!duplicate)  {
+      axiosService.create(personObject).then((returned) => {
+      setPersons(persons.concat(returned))
+      setNewName('')
+      setNewNumber('')
+    })
+    }
+    else if (window.confirm(`${newName} is already added, replace with new number?`)) {
+      console.log(duplicate)
+      axiosService.update(duplicate.id,personObject).then((returned) => {
+      setPersons(persons.map((person) => person.id === duplicate.id ? returned : person))
+      setNewName('')
+      setNewNumber('')
+    })
+    }
   }
 return (
 <>    

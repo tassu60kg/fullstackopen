@@ -2,23 +2,32 @@ import { useState, useEf, useEffect } from 'react'
 import Form from './components/form'
 import Persons from './components/persons'
 import Filter from './components/filter'
-import axios from 'axios'
+import axiosService from './services/axios'
+const baseUrl = 'http://localhost:3001/persons'
+
+
 
 const App = () => {
   const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
-   
+  
+  
+  const deleteHandler = (id, name) => {
+    if (window.confirm(`${name} will be obliterated`)) {
+    axiosService.exterminate(id).then(() => {
+      setPersons(persons.filter((person) => person.id != id))
+    })}
+  }
+
   useEffect(() => {
-    console.log('effect')
-    axios
-        .get('http://localhost:3001/persons')
-        .then(response => {
-          console.log('promise fulfilled')
-          setPersons(response.data)
-        })
+      axiosService.getAll().then((initialPeople) => {
+        setPersons(initialPeople)
+      })
   }, [])
+
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -31,7 +40,9 @@ const App = () => {
         setNewNumber={setNewNumber}/>
       
       <Persons persons={persons} 
-        search={search}/>
+        search={search}
+        deleteHandler={deleteHandler}
+        />
     </div>
   )
 
