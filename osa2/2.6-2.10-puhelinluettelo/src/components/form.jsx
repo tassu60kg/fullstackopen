@@ -1,6 +1,7 @@
-import axiosService from '../services/axios'
+import dataService from '../services/data'
 
-const Form = ({persons, setPersons, newName, newNumber, setNewName, setNewNumber}) => {
+
+const Form = ({persons, setPersons, newName, newNumber, setNewName, setNewNumber, setMessage}) => {
 
     const handleNameInput = (event) => {
     setNewName(event.target.value)
@@ -10,25 +11,37 @@ const handleNumberInput = (event) => {
   }
   const addPerson = (event) => {
     event.preventDefault()
-    const personObject ={
+    const personObject ={ 
       name: newName,
       number: newNumber
     }
     const duplicate = (persons.find((person) => person.name === newName))
-    console.log(duplicate)
     if (!duplicate)  {
-      axiosService.create(personObject).then((returned) => {
+      dataService.create(personObject).then((returned) => {
       setPersons(persons.concat(returned))
       setNewName('')
       setNewNumber('')
+      setMessage(`${newName} added`)
+      setTimeout(() => {setMessage(null)}, 5000)
+    }).catch(error => {
+      console.log("oops :3")
+      setMessage("this message should not appear")
+      setTimeout(() => {setMessage(null)}, 5000)
     })
-    }
+  }
+    
     else if (window.confirm(`${newName} is already added, replace with new number?`)) {
-      console.log(duplicate)
-      axiosService.update(duplicate.id,personObject).then((returned) => {
+      dataService.update(duplicate.id,personObject).then((returned) => {
       setPersons(persons.map((person) => person.id === duplicate.id ? returned : person))
       setNewName('')
       setNewNumber('')
+      setMessage(`${newName} number changed`) 
+      setTimeout(() => {setMessage(null)}, 5000)
+    }).catch(error => {
+      setPersons(persons.filter((person) => person.id != duplicate.id))
+      console.log("oops :3")
+      setMessage("this person doesn't exist")
+      setTimeout(() => {setMessage(null)}, 5000)
     })
     }
   }
